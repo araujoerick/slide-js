@@ -60,9 +60,47 @@ export default class Slide {
     this.onEnd = this.onEnd.bind(this);
   }
 
+  // Slides config
+
+  // Calcula o total da tela para centralizar a imagem
+  slidePosition(slide) {
+    // Largura da tela - largura da li/imagem atual / por 2 = margem de cada lado
+    const margin = (this.wrapper.offsetWidth - slide.offsetWidth) / 2;
+    return -(slide.offsetLeft - margin); // Esse valor é negativo
+  }
+
+  slidesConfig() {
+    // Desestrutura e coloca cada imagem do slide em um index da array
+    this.slideArray = [...this.slide.children].map((element) => {
+      // O map retorna uma array modificada de acordo com o que foi definido no return
+      const position = this.slidePosition(element);
+      return { position, element };
+    });
+  }
+
+  // Índice da navegação dos slides
+  slidesIndexNav(index) {
+    const last = this.slideArray.length - 1; // Define o último index de acordo o length
+
+    // Define o index do slide anterior, atual e próximo
+    this.index = {
+      prev: index ? index - 1 : undefined,
+      active: index,
+      next: index === last ? undefined : index + 1,
+    };
+  }
+
+  changeSlide(index) {
+    const activeSlide = this.slideArray[index];
+    this.moveSlide(activeSlide.position);
+    this.slidesIndexNav(index); // Seta o slide atual
+    this.dist.finalPosition = activeSlide.position;
+  }
+
   init() {
     this.bindEvents();
     this.addSlideEvents();
+    this.slidesConfig();
     return this;
   }
 }
